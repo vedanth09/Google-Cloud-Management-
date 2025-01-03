@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Admin Portal</title>
+</head>
+<body>
+    <h1>University Admin Portal</h1>
+    <button onclick="uploadCSV()">Upload CSV</button>
+    <button onclick="viewStudents()">View Students</button>
+    <div id="studentList"></div>
+    <script>
+        async function uploadCSV() {
+            // Prompt file upload
+            let file = document.createElement('input');
+            file.type = 'file';
+            file.accept = 'csv';
+            file.onchange = async () => {
+                let formData = new FormData();
+                formData.append('file', file.files[0]);
+
+                try {
+                    const response = await fetch('/upload_csv', {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    // Parse the JSON response from the backend
+                    const data = await response.json();
+
+                    // Show alert with the message from the backend
+                    alert(data.message);
+                } catch (error) {
+                    // Handle errors
+                    alert('An error occurred while uploading the CSV!');
+                }
+            };
+            file.click();
+        }
+
+        async function viewStudents() {
+            try {
+                const response = await fetch('/get_students');
+                const students = await response.json();
+
+                // Create a list of students with a delete button
+                const list = students.map(
+                    (student) =>
+                        `<p>${student.first_name} ${student.last_name} (${student.university_email})
+                         <button onclick="deleteStudent('${student.university_email}')">Delete</button></p>`
+                );
+                document.getElementById('studentList').innerHTML = list.join('');
+            } catch (error) {
+                // Handle errors
+                alert('An error occurred while fetching student data!');
+            }
+        }
+
+        async function deleteStudent(email) {
+            try {
+                const response = await fetch('/delete_account', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email }),
+                });
+
+                // Parse the JSON response from the backend
+                const data = await response.json();
+
+                // Show alert with the message from the backend
+                alert(data.message);
+
+                // Refresh the list of students
+                viewStudents();
+            } catch (error) {
+                // Handle errors
+                alert('An error occurred while deleting the student account!');
+            }
+        }
+    </script>
+</body>
+</html>
