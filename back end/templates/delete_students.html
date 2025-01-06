@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Students</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="my-4">Delete Students</h1>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert alert-dismissible fade show" role="alert">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Select Students for Deletion -->
+        <form action="{{ url_for('delete_records') }}" method="POST">
+            <div class="form-group">
+                <label for="delete_all">Delete All Records</label>
+                <input type="checkbox" name="delete_all" id="delete_all">
+            </div>
+
+            <h4>Select Students to Delete</h4>
+            <div class="form-group">
+                {% for student in students %}
+                    <div class="form-check">
+                        <input type="checkbox" name="selected_emails" value="{{ student.personal_email }}" class="form-check-input">
+                        <label class="form-check-label">{{ student.first_name }} {{ student.last_name }} ({{ student.personal_email }})</label>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="btn btn-danger">Delete Selected Records</button>
+        </form>
+
+        <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+    </div>
+
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

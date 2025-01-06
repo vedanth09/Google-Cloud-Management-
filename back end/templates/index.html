@@ -3,38 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>University Admin Portal</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <title>University Admin</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 class="text-center">University Admin Portal</h1>
-        <hr>
+    <div class="container">
+        <h1 class="my-4">University Admin Dashboard</h1>
 
-        {% with messages = get_flashed_messages(with_categories=True) %}
-        {% if messages %}
-        <div class="container">
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }} mt-3">{{ message }}</div>
-            {% endfor %}
-        </div>
-        {% endif %}
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert alert-dismissible fade show" role="alert">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
         {% endwith %}
 
-        <form action="/upload_csv" method="post" enctype="multipart/form-data" class="mt-4">
-            <div class="mb-3">
-                <label for="file" class="form-label">Upload CSV File</label>
-                <input type="file" name="file" id="file" class="form-control" accept=".csv" required>
+        <!-- Upload CSV Form -->
+        <h3>Upload Student CSV</h3>
+        <form action="{{ url_for('upload_csv') }}" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <input type="file" name="file" class="form-control" required>
             </div>
-            <button type="submit" class="btn btn-primary">Upload and Process</button>
+            <button type="submit" class="btn btn-primary">Upload CSV</button>
         </form>
 
-        <!-- Button to send email to all students -->
-        <form action="/send_email" method="POST" class="mt-4">
-            <button type="submit" class="btn btn-success">Send Emails to All Students</button>
+        <hr>
+
+        <!-- Students Table -->
+        <h3>Student List</h3>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Personal Email</th>
+                    <th>University Email</th>
+                    <th>Account Status</th>
+                    <th>Email Sent</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                    <tr>
+                        <td>{{ student.first_name }}</td>
+                        <td>{{ student.last_name }}</td>
+                        <td>{{ student.personal_email }}</td>
+                        <td>{{ student.university_email }}</td>
+                        <td>{{ student.account_status }}</td>
+                        <td>{{ 'Yes' if student.email_sent else 'No' }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Send Email Button -->
+        <form action="{{ url_for('send_emails') }}" method="POST">
+            <button type="submit" class="btn btn-success">Send Emails to New Students</button>
         </form>
+
+        <!-- Delete Records Button -->
+        <form action="{{ url_for('delete_records') }}" method="POST">
+            <button type="submit" class="btn btn-danger">Delete All Records</button>
+        </form>
+
+        <a href="{{ url_for('delete_students') }}" class="btn btn-warning mt-3">Manage Student Deletion</a>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
